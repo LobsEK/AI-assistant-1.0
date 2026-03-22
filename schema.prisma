@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Agent {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // "gmail" | "news"
+  description String
+  isActive    Boolean  @default(true)
+  lastSync    DateTime?
+  uptime      Int      @default(0)
+  createdAt   DateTime @default(now())
+  logs        AgentLog[]
+}
+
+model AgentLog {
+  id        String   @id @default(cuid())
+  agentId   String
+  agent     Agent    @relation(fields: [agentId], references: [id])
+  status    String   // "success" | "error" | "warning"
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model NewsItem {
+  id          String   @id @default(cuid())
+  company     String
+  model       String?
+  title       String
+  summary     String
+  bullets     String   // JSON array
+  aiAnalysis  String?  // JSON: { reality, howToUse }
+  category    String   // "text-models" | "speech" | "vision" | "other"
+  sourceUrl   String
+  logoEmoji   String?
+  publishedAt DateTime
+  fetchedAt   DateTime @default(now())
+}
